@@ -37,9 +37,9 @@ namespace Babylon::Polyfills::Internal
         , m_webSocket(
               info[0].As<Napi::String>(),
               [this] { OpenCallback(); },
-              [this] { CloseCallback(); },
+              [this](int code, std::string reason) { CloseCallback(code, reason); },
               [this](std::string message) { MessageCallback(message); },
-              [this] { ErrorCallback(); })
+              [this](std::string message) { ErrorCallback(message); })
     {
         m_url = info[0].As<Napi::String>();
         m_webSocket.Open();
@@ -182,7 +182,7 @@ namespace Babylon::Polyfills::Internal
         });
     };
 
-    void WebSocket::CloseCallback()
+    void WebSocket::CloseCallback(int code, std::string reason)
     {
         m_readyState = ReadyState::Closed;
         m_runtimeScheduler([this]() {
@@ -227,7 +227,7 @@ namespace Babylon::Polyfills::Internal
         });
     }
 
-    void WebSocket::ErrorCallback()
+    void WebSocket::ErrorCallback(std::string message)
     {
         m_runtimeScheduler([this]() {
             try

@@ -35,9 +35,9 @@ namespace Babylon::Polyfills::Internal
         Napi::Value GetOnError(const Napi::CallbackInfo& info);
 
         void OpenCallback();
-        void CloseCallback();
+        void CloseCallback(int code, std::string reason);
         void MessageCallback(std::string message);
-        void ErrorCallback();
+        void ErrorCallback(std::string message);
 
         void Close(const Napi::CallbackInfo& info);
         void Send(const Napi::CallbackInfo& info);
