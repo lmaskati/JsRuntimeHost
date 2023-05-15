@@ -185,10 +185,12 @@ namespace Babylon::Polyfills::Internal
     void WebSocket::CloseCallback(int code, std::string reason)
     {
         m_readyState = ReadyState::Closed;
-        m_runtimeScheduler([this]() {
+        m_runtimeScheduler([this, code, reason = std::move(reason)]() {
             try
             {
                 Napi::Object closeEvent = Napi::Object::New(Env());
+                closeEvent.Set("code", code);
+                closeEvent.Set("reason", reason);
                 if (!m_onclose.IsEmpty())
                 {
                     m_onclose.Call({closeEvent});
@@ -229,12 +231,13 @@ namespace Babylon::Polyfills::Internal
 
     void WebSocket::ErrorCallback(std::string message)
     {
-        m_runtimeScheduler([this]() {
+        m_runtimeScheduler([this, message = std::move(message)]() {
             try
             {
                 if (!m_onerror.IsEmpty())
                 {
                     Napi::Object errorEvent = Napi::Object::New(Env());
+                    errorEvent.Set("message", message);
                     m_onerror.Call({errorEvent});
                 }
             }
